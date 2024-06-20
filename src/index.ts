@@ -28,18 +28,6 @@ import ProductInterface from "./models/models";
 			const imageUrl = await product
 				.locator("div.image-box img")
 				.getAttribute("src");
-			const hasBrand = await product.locator("a > span").count();
-			let brand: string;
-			let brandLink: string;
-			if (hasBrand >= 1) {
-				brand = await product.locator("a > span").innerText();
-				brandLink =
-					"https://www.takealot.com" +
-					(await product
-						.locator("a > span")
-						.locator("..")
-						.getAttribute("href"));
-			}
 			const productLink =
 				"https://www.takealot.com" +
 				(await product.locator("> a").getAttribute("href"));
@@ -47,20 +35,10 @@ import ProductInterface from "./models/models";
 				.locator("div.rating > div")
 				.first()
 				.innerText();
-			const hasSale = await product.locator("div.card-section ul li").count();
-			let price = "";
-			if (hasSale > 1) {
-				const price = await product
-					.locator("div.card-section ul li")
-					.last()
-					.innerText();
-				const salePrice = await product
-					.locator("div.card-section ul li")
-					.first()
-					.innerText();
-			} else {
-				const price = await product.locator("li.price").innerText();
-			}
+			const price = await product
+				.locator("div.card-section ul li")
+				.last()
+				.innerText();
 
 			const productObject: ProductInterface = {
 				name,
@@ -69,6 +47,25 @@ import ProductInterface from "./models/models";
 				rating,
 				price,
 			};
+
+			const hasBrand = await product.locator("a > span").count();
+			if (hasBrand >= 1) {
+				productObject.brand = await product.locator("a > span").innerText();
+				productObject.brandLink =
+					"https://www.takealot.com" +
+					(await product
+						.locator("a > span")
+						.locator("..")
+						.getAttribute("href"));
+			}
+
+			const hasSale = await product.locator("div.card-section ul li").count();
+			if (hasSale > 1) {
+				productObject.salePrice = await product
+					.locator("div.card-section ul li")
+					.first()
+					.innerText();
+			}
 
 			scrapedProducts.push(productObject);
 		}
