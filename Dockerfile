@@ -8,5 +8,5 @@ RUN bun install
 
 COPY . .
 
-ENV ELASTIC_CONNECTION_STRING=elastic_db
-CMD ["bun", "run", "index.ts"]
+ENV ELASTIC_CONNECTION_STRING elastic_db
+CMD ["bun", "run", "src/index.ts"]
