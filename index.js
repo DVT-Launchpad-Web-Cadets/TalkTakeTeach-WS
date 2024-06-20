@@ -14,7 +14,7 @@ import { chromium } from "playwright";
 		console.log("number of products scrapped:", products.length);
 		for (let product of products) {
 			let productObject = {};
-			productObject.productLink = await product.$eval("div > div > a", (el) => el.getAttribute("href"));
+			productObject.productLink = "https://www.takealot.com" + await product.$eval("div > div > a", (el) => el.getAttribute("href"));
 			// productObject.name = await product.$eval("div > div > div > div > a > h3", (el) => el.textContent);
 			console.log("productObject: ", productObject);
 		}
