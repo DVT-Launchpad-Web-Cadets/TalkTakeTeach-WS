@@ -8,11 +8,14 @@ import ProductInterface from "./models/models";
 	const context = await browser.newContext();
 	const page = await context.newPage();
 	console.log(
-		"\nStarting to scrape https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF\n"
+		"\nStarting to scrape https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF\n",
+		process.env.PAGE_URL
 	);
-	const url = "https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF";
+	const url = process.env.PAGE_URL;
 	try {
-		await page.goto(url);
+		await page.goto(
+			url ?? "https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF"
+		);
 		const products = await page.locator("div.product-card").all();
 		if (!products) {
 			throw new Error("No products found");

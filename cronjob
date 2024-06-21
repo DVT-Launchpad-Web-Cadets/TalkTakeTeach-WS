@@ -1,0 +1,2 @@
+# Run the script every minute
+* * * * * /app/run-scraper.sh >> /var/log/cron.log 2>&1
