@@ -1,0 +1,15 @@
+{
+  "name": "talktaketeach-ws",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.14.0",
+    "playwright": "^1.44.1"
+  }
+}
