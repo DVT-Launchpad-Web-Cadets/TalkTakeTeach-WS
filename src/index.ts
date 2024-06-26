@@ -1,35 +1,45 @@
 import { chromium } from "playwright";
 import ProductInterface from "./models/models";
+import base64 from "base-64";
 
 (async () => {
 	console.log("\nSetting up web scraper\n");
+
 	const scrapedProducts: ProductInterface[] = [];
 	const browser = await chromium.launch();
 	const context = await browser.newContext();
 	const page = await context.newPage();
+
 	console.log(
 		"\nStarting to scrape https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF\n",
 		process.env.PAGE_URL
 	);
+
 	const url = process.env.PAGE_URL;
+
 	try {
 		await page.goto(
 			url ?? "https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF"
 		);
+
 		const products = await page.locator("div.product-card").all();
+
 		if (!products) {
 			throw new Error("No products found");
 		}
+
 		const sizes = await page.evaluate(() => {
 			const browserHeight = window.innerHeight;
 			const pageHeight = document.body.scrollHeight;
 
 			return { browserHeight, pageHeight };
 		});
+
 		for (let i = 0; i < sizes.pageHeight; i += 100) {
 			await page.mouse.wheel(0, i);
 			await page.waitForTimeout(1);
 		}
+
 		for (let product of products) {
 			const name = await product.locator("h4").innerText();
 			const imageUrl = await product
@@ -50,7 +60,9 @@ import ProductInterface from "./models/models";
 				productLink,
 				price,
 			};
+ 
 			const hasSale = await product.locator("div.card-section ul li").count();
+
 			if (hasSale > 1) {
 				productObject.salePrice = parseInt(
 					(await product.locator("div.card-section ul li").first().innerText())
@@ -58,7 +70,9 @@ import ProductInterface from "./models/models";
 						.reverse()[0]
 				);
 			}
+
 			const hasBrand = await product.locator("a > span").count();
+
 			if (hasBrand >= 1) {
 				productObject.brand = await product.locator("a > span").innerText();
 				productObject.brandLink =
@@ -68,7 +82,9 @@ import ProductInterface from "./models/models";
 						.locator("..")
 						.getAttribute("href"));
 			}
+
 			const hasRating = await product.locator("div.rating").count();
+
 			if (hasRating >= 1) {
 				const ratingAndReviews = (
 					await product.locator("div.rating > div").first().innerText()
@@ -83,6 +99,60 @@ import ProductInterface from "./models/models";
 
 			scrapedProducts.push(productObject);
 		}
+
+		for (let scrapedProduct of scrapedProducts) {
+			const productUrl =
+				`${process.env.ELASTIC_URL}/products/_doc/${encodeURIComponent(
+					scrapedProduct.productLink
+				)}` ||
+				`https://localhost:9200/products/_doc/${encodeURIComponent(
+					scrapedProduct.productLink
+				)}`;
+
+			fetch(productUrl, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Basic ${base64.encode(
+						`elastic:${process.env.ELASTIC_PASSWORD}`
+					)}`,
+				},
+				tls: {
+					rejectUnauthorized: false,
+				},
+			})
+				.then((resp) => {
+					if (!resp.ok && resp.status !== 404) {
+						throw new Error(`HTTP error! status: ${resp.status}`);
+					}
+					return resp.json();
+				})
+				.then((res) => {
+					const method = res.found ? "PUT" : "POST";
+					return fetch(productUrl, {
+						method,
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Basic ${base64.encode(
+								`elastic:${process.env.ELASTIC_PASSWORD}`
+							)}`,
+						},
+						tls: {
+							rejectUnauthorized: false,
+						},
+						body: JSON.stringify(scrapedProduct),
+					});
+				})
+				.then((resp) => {
+					if (!resp.ok) {
+						throw new Error(`HTTP error! status: ${resp.status}`);
+					}
+					return resp.json();
+				})
+				.then((res) => console.log(res))
+				.catch((err) => console.error(err.message));
+		}
+
 		console.log("Products:", scrapedProducts);
 		console.log("Number of products scraped:", scrapedProducts.length);
 	} catch (error) {
