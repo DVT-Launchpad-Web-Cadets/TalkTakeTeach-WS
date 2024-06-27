@@ -60,7 +60,7 @@ import base64 from "base-64";
 				productLink,
 				price,
 			};
- 
+
 			const hasSale = await product.locator("div.card-section ul li").count();
 
 			if (hasSale > 1) {
@@ -101,14 +101,19 @@ import base64 from "base-64";
 		}
 
 		for (let scrapedProduct of scrapedProducts) {
-			const productUrl =
-				`${process.env.ELASTIC_URL}/products/_doc/${encodeURIComponent(
-					scrapedProduct.productLink
-				)}` ||
-				`https://localhost:9200/products/_doc/${encodeURIComponent(
-					scrapedProduct.productLink
-				)}`;
+			const url = scrapedProduct.productLink;
+			const regex = /PLID(\d+)/;
+			const match = url.match(regex);
+			let plid = "0";
 
+			if (match) {
+				plid = match[1];
+				console.log("PLID:", plid);
+			}
+
+			const productUrl =
+				`${process.env.ELASTIC_URL}/products/_doc/${plid}` ||
+				`https://localhost:9200/products/_doc/${plid}`;
 			fetch(productUrl, {
 				method: "GET",
 				headers: {
