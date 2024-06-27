@@ -1,4 +1,5 @@
 export default interface ProductInterface {
+	id?: string;
 	name: string;
 	imageUrl: string;
 	brand?: string;
@@ -8,4 +9,17 @@ export default interface ProductInterface {
 	numberOfReviews?: number;
 	price: number;
 	salePrice?: number;
+}
+
+export interface ProductResponseInterface {
+	hits: HitsInterface;
+}
+
+export interface HitsInterface {
+	hits: HitsInfo[];
+}
+
+export interface HitsInfo {
+	_id: string;
+	_source: ProductInterface;
 }
