@@ -1,6 +1,6 @@
-export default interface ProductInterface {
+export interface ProductInterface {
 	id?: string;
-	name: string;
+	name: NameInterface;
 	imageUrl: string;
 	brand?: string;
 	brandLink?: string;
@@ -15,11 +15,15 @@ export interface ProductResponseInterface {
 	hits: HitsInterface;
 }
 
-export interface HitsInterface {
+interface HitsInterface {
 	hits: HitsInfo[];
 }
 
-export interface HitsInfo {
+interface HitsInfo {
 	_id: string;
 	_source: ProductInterface;
+}
+
+interface NameInterface {
+	input: string[];
 }

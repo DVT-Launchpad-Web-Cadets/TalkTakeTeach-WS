@@ -1,5 +1,5 @@
 import { chromium } from "playwright";
-import ProductInterface from "./models/models";
+import { ProductInterface } from "./models/models";
 import base64 from "base-64";
 
 (async () => {
@@ -9,18 +9,14 @@ import base64 from "base-64";
 	const browser = await chromium.launch();
 	const context = await browser.newContext();
 	const page = await context.newPage();
+	const url =
+		process.env.PAGE_URL ??
+		"https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF";
 
-	console.log(
-		"\nStarting to scrape https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF\n",
-		process.env.PAGE_URL
-	);
-
-	const url = process.env.PAGE_URL;
+	console.log("\nStarting to scrape", url);
 
 	try {
-		await page.goto(
-			url ?? "https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF"
-		);
+		await page.goto(url);
 
 		const products = await page.locator("div.product-card").all();
 
@@ -40,7 +36,7 @@ import base64 from "base-64";
 			await page.waitForTimeout(1);
 		}
 
-		for (let product of products) {
+		for (const product of products) {
 			const name = await product.locator("h4").innerText();
 			const imageUrl = await product
 				.locator("div.image-box img")
@@ -55,15 +51,13 @@ import base64 from "base-64";
 			);
 
 			const productObject: ProductInterface = {
-				name,
+				name: { input: [name] },
 				imageUrl: imageUrl ?? "",
 				productLink,
 				price,
 			};
 
-			const hasSale = await product.locator("div.card-section ul li").count();
-
-			if (hasSale > 1) {
+			if ((await product.locator("div.card-section ul li").count()) > 1) {
 				productObject.salePrice = parseInt(
 					(await product.locator("div.card-section ul li").first().innerText())
 						.split(" ")
@@ -71,9 +65,7 @@ import base64 from "base-64";
 				);
 			}
 
-			const hasBrand = await product.locator("a > span").count();
-
-			if (hasBrand >= 1) {
+			if ((await product.locator("a > span").count()) >= 1) {
 				productObject.brand = await product.locator("a > span").innerText();
 				productObject.brandLink =
 					"https://www.takealot.com" +
@@ -83,9 +75,7 @@ import base64 from "base-64";
 						.getAttribute("href"));
 			}
 
-			const hasRating = await product.locator("div.rating").count();
-
-			if (hasRating >= 1) {
+			if ((await product.locator("div.rating").count()) >= 1) {
 				const ratingAndReviews = (
 					await product.locator("div.rating > div").first().innerText()
 				)
@@ -100,20 +90,16 @@ import base64 from "base-64";
 			scrapedProducts.push(productObject);
 		}
 
-		for (let scrapedProduct of scrapedProducts) {
+		for (const scrapedProduct of scrapedProducts) {
 			const url = scrapedProduct.productLink;
 			const regex = /PLID(\d+)/;
 			const match = url.match(regex);
-			let plid = "0";
-
-			if (match) {
-				plid = match[1];
-				console.log("PLID:", plid);
-			}
+			const plid = match ? match[1] : "0";
 
 			const productUrl =
 				`${process.env.ELASTIC_URL}/products/_doc/${plid}` ||
 				`https://localhost:9200/products/_doc/${plid}`;
+
 			fetch(productUrl, {
 				method: "GET",
 				headers: {
@@ -157,9 +143,6 @@ import base64 from "base-64";
 				.then((res) => console.log(res))
 				.catch((err) => console.error(err.message));
 		}
-
-		console.log("Products:", scrapedProducts);
-		console.log("Number of products scraped:", scrapedProducts.length);
 	} catch (error) {
 		console.error("Error while scraping:", error);
 	} finally {

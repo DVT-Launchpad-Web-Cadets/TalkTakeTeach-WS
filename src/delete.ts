@@ -1,9 +1,9 @@
 import { chromium } from "playwright";
-import ProductInterface, { ProductResponseInterface } from "./models/models";
+import { ProductResponseInterface } from "./models/models";
 import base64 from "base-64";
 
 (async () => {
-	let products = await getProducts();
+	const products = await getProducts();
 
 	if (!products) {
 		console.error("No products found.");
@@ -13,7 +13,7 @@ import base64 from "base-64";
 	const browser = await chromium.launch();
 	const context = await browser.newContext();
 
-	for (let product of products) {
+	for (const product of products) {
 		const url = product.productLink;
 		const page = await context.newPage();
 
@@ -52,7 +52,7 @@ async function getProducts() {
 				rejectUnauthorized: false,
 			},
 			body: JSON.stringify({
-				size: 1000,
+				size: 10000,
 				query: {
 					match_all: {},
 				},
@@ -72,7 +72,7 @@ async function getProducts() {
 async function deleteProduct(id: string) {
 	return fetch(
 		`${process.env.ELASTIC_URL}/products/_doc/${id}` ||
-			"https://localhost:9200/products/_search",
+			`https://localhost:9200/products/_doc/${id}`,
 		{
 			method: "delete",
 			headers: {
