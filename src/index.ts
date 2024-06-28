@@ -5,6 +5,8 @@ import base64 from "base-64";
 (async () => {
 	console.log("\nSetting up web scraper\n");
 
+	await checkAndCreateIndex();
+
 	const scrapedProducts: ProductInterface[] = [];
 	const browser = await chromium.launch();
 	const context = await browser.newContext();
@@ -51,7 +53,7 @@ import base64 from "base-64";
 			);
 
 			const productObject: ProductInterface = {
-				name: { input: [name] },
+				name,
 				imageUrl: imageUrl ?? "",
 				productLink,
 				price,
@@ -150,3 +152,85 @@ import base64 from "base-64";
 		console.log("\nWeb scraping ended X_X\n");
 	}
 })();
+
+async function checkAndCreateIndex() {
+	const indexUrl = process.env.ELASTIC_URL
+		? `${process.env.ELASTIC_URL}/products`
+		: "https://localhost:9200/products";
+	const indexMapping = {
+		mappings: {
+			properties: {
+				name: {
+					type: "completion",
+				},
+				imageUrl: {
+					type: "text",
+				},
+				productLink: {
+					type: "text",
+				},
+				price: {
+					type: "float",
+				},
+				salePrice: {
+					type: "integer",
+				},
+				brand: {
+					type: "text",
+				},
+				brandLink: {
+					type: "text",
+				},
+				rating: {
+					type: "float",
+				},
+				numberOfReviews: {
+					type: "integer",
+				},
+			},
+		},
+	};
+
+	try {
+		const response = await fetch(indexUrl, {
+			method: "HEAD",
+			headers: {
+				Authorization: `Basic ${base64.encode(
+					`elastic:${process.env.ELASTIC_PASSWORD}`
+				)}`,
+			},
+			tls: {
+				rejectUnauthorized: false,
+			},
+		});
+
+		if (response.status === 404) {
+			console.log("Creating products index...");
+			const createResponse = await fetch(indexUrl, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Basic ${base64.encode(
+						`elastic:${process.env.ELASTIC_PASSWORD}`
+					)}`,
+				},
+				tls: {
+					rejectUnauthorized: false,
+				},
+				body: JSON.stringify(indexMapping),
+			});
+
+			if (!createResponse.ok) {
+				throw new Error(
+					`Failed to create index! status: ${createResponse.status}`
+				);
+			}
+
+			console.log("Products index created successfully.");
+		} else {
+			console.log("Products index already exists.");
+		}
+	} catch (err) {
+		console.error("Error checking or creating index:", err);
+	}
+}

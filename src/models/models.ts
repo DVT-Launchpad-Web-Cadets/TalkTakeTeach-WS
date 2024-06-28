@@ -1,6 +1,6 @@
 export interface ProductInterface {
 	id?: string;
-	name: NameInterface;
+	name: string;
 	imageUrl: string;
 	brand?: string;
 	brandLink?: string;
