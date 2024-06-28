@@ -2,7 +2,8 @@ FROM oven/bun
 
 WORKDIR /app
 
-ENV ELASTIC_CONNECTION_STRING elastic_db
+ENV ELASTIC_URL "https://localhost:9200"
+ENV PAGE_URL "https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF"
 
 COPY . .
 
