@@ -54,7 +54,7 @@ import base64 from "base-64";
 			);
 
 			const productObject: ProductInterface = {
-				name,
+				name: { input: [name] },
 				imageUrl: imageUrl ?? "",
 				productLink,
 				price,

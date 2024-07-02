@@ -22,7 +22,7 @@ import base64 from "base-64";
 			const heading = await page.locator("h1").innerText();
 
 			if (
-				heading.inculdes("Oops")
+				heading.includes("Oops")
 			) {
 				deleteProduct(product.id ?? "");
 			}

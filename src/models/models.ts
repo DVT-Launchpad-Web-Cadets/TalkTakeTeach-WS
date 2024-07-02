@@ -1,6 +1,6 @@
 export interface ProductInterface {
 	id?: string;
-	name: string;
+	name: CompletionInterface;
 	imageUrl: string;
 	brand?: string;
 	brandLink?: string;
@@ -9,6 +9,10 @@ export interface ProductInterface {
 	numberOfReviews?: number;
 	price: number;
 	salePrice?: number;
+}
+
+export interface CompletionInterface {
+	input: String[];
 }
 
 export interface ProductResponseInterface {
