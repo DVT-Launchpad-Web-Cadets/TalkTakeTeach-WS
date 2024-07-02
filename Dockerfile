@@ -44,5 +44,6 @@ RUN chmod 0644 /etc/cron.d/cronjob
 RUN crontab /etc/cron.d/cronjob
 
 RUN touch /var/log/cron.log
+RUN touch /var/log/cron.error.log
 
-CMD cron && tail -f /var/log/cron.log
+CMD ["cron", "-f"]
