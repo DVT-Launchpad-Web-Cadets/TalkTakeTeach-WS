@@ -3,6 +3,8 @@ FROM oven/bun
 WORKDIR /app
 
 ENV ELASTIC_URL "https://localhost:9200"
+ENV ELASTIC_USERNAME "elastic"
+ENV ELASTIC_PASSWORD "8HGdKO=3drZRL9tWb14E"
 ENV PAGE_URL "https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF"
 
 COPY . .
@@ -31,7 +33,8 @@ RUN apt-get update && apt-get -y install \
     libxkbcommon0 \
     libpango-1.0-0 \
     libcairo2 \
-    libasound2
+    libasound2 \
+    coreutils
 
 RUN bun x playwright install
 

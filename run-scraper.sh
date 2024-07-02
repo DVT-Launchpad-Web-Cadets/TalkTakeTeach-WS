@@ -1,3 +1,5 @@
+#!/bin/sh
+
 cd /app
 
 if [ "$1" = "job1" ]; then
@@ -7,3 +9,5 @@ elif [ "$1" = "job2" ]; then
 else
     echo "Unknown job: $1"
 fi
+
+exec "$@"

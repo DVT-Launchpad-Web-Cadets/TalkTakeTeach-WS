@@ -108,7 +108,7 @@ import base64 from "base-64";
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: `Basic ${base64.encode(
-						`elastic:${process.env.ELASTIC_PASSWORD}`
+						`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
 					)}`,
 				},
 				tls: {
@@ -128,7 +128,7 @@ import base64 from "base-64";
 						headers: {
 							"Content-Type": "application/json",
 							Authorization: `Basic ${base64.encode(
-								`elastic:${process.env.ELASTIC_PASSWORD}`
+								`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
 							)}`,
 						},
 						tls: {
@@ -197,7 +197,7 @@ async function checkAndCreateIndex() {
 			method: "HEAD",
 			headers: {
 				Authorization: `Basic ${base64.encode(
-					`elastic:${process.env.ELASTIC_PASSWORD}`
+					`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
 				)}`,
 			},
 			tls: {
@@ -212,7 +212,7 @@ async function checkAndCreateIndex() {
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: `Basic ${base64.encode(
-						`elastic:${process.env.ELASTIC_PASSWORD}`
+						`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
 					)}`,
 				},
 				tls: {

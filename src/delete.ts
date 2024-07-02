@@ -22,7 +22,7 @@ import base64 from "base-64";
 			const heading = await page.locator("h1").innerText();
 
 			if (
-				heading === "Oops!\nIt looks like this product is no longer available."
+				heading.inculdes("Oops")
 			) {
 				deleteProduct(product.id ?? "");
 			}
@@ -44,7 +44,7 @@ async function getProducts() {
 			method: "post",
 			headers: {
 				Authorization: `Basic ${base64.encode(
-					`elastic:${process.env.ELASTIC_PASSWORD}`
+					`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
 				)}`,
 				"Content-Type": "application/json",
 			},
@@ -77,7 +77,7 @@ async function deleteProduct(id: string) {
 			method: "delete",
 			headers: {
 				Authorization: `Basic ${base64.encode(
-					`elastic:${process.env.ELASTIC_PASSWORD}`
+					`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
 				)}`,
 				"Content-Type": "application/json",
 			},
