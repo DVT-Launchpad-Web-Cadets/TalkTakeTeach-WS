@@ -19,6 +19,7 @@ import base64 from "base-64";
 
 	try {
 		await page.goto(url);
+        await page.waitForTimeout(5000);
 
 		const products = await page.locator("div.product-card").all();
 
