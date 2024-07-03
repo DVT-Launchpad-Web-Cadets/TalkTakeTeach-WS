@@ -101,7 +101,7 @@ import base64 from "base-64";
 
 			const productUrl =
 				`${process.env.ELASTIC_URL}/products/_doc/${plid}` ||
-				`https://localhost:9200/products/_doc/${plid}`;
+				`https://elasticsearch:9200/products/_doc/${plid}`;
 
 			fetch(productUrl, {
 				method: "GET",
@@ -157,7 +157,7 @@ import base64 from "base-64";
 async function checkAndCreateIndex() {
 	const indexUrl = process.env.ELASTIC_URL
 		? `${process.env.ELASTIC_URL}/products`
-		: "https://localhost:9200/products";
+		: "https://elasticsearch:9200/products";
 	const indexMapping = {
 		mappings: {
 			properties: {

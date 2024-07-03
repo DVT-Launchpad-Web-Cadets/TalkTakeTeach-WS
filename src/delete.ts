@@ -39,7 +39,7 @@ import base64 from "base-64";
 async function getProducts() {
 	return fetch(
 		`${process.env.ELASTIC_URL}/products/_search` ||
-			"https://localhost:9200/products/_search",
+			"https://elasticsearch:9200/products/_search",
 		{
 			method: "post",
 			headers: {
@@ -72,7 +72,7 @@ async function getProducts() {
 async function deleteProduct(id: string) {
 	return fetch(
 		`${process.env.ELASTIC_URL}/products/_doc/${id}` ||
-			`https://localhost:9200/products/_doc/${id}`,
+			`https://elasticsearch:9200/products/_doc/${id}`,
 		{
 			method: "delete",
 			headers: {
