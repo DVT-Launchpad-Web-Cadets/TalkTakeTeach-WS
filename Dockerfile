@@ -40,13 +40,17 @@ RUN bun x playwright install
 
 COPY cronjob /etc/cron.d/cronjob
 COPY run-scraper.sh /app/run-scraper.sh
+COPY run-delete.sh /app/run-delete.sh
 
 RUN chmod +x /app/run-scraper.sh
+RUN chmod +x /app/run-delete.sh
 
 RUN chmod 0644 /etc/cron.d/cronjob
 RUN crontab /etc/cron.d/cronjob
 
 RUN touch /var/log/cron.log
 RUN touch /var/log/cron.error.log
+
+RUN printenv > /etc/environment
 
 CMD ["cron", "-f"]
