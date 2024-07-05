@@ -1,6 +1,6 @@
+import base64 from "base-64";
 import { chromium } from "playwright";
 import { ProductInterface } from "./models/models";
-import base64 from "base-64";
 
 (async () => {
 	console.log("\nSetting up web scraper\n");
@@ -19,7 +19,7 @@ import base64 from "base-64";
 
 	try {
 		await page.goto(url);
-        await page.waitForTimeout(5000);
+		await page.waitForTimeout(5000);
 
 		const products = await page.locator("div.product-card").all();
 
@@ -98,10 +98,10 @@ import base64 from "base-64";
 			const regex = /PLID(\d+)/;
 			const match = url.match(regex);
 			const plid = match ? match[1] : "0";
-
-			const productUrl =
-				`${process.env.ELASTIC_URL}/products/_doc/${plid}` ||
-				`https://elasticsearch:9200/products/_doc/${plid}`;
+			const productsUrl = process.env.ELASTIC_URL
+				? `${process.env.ELASTIC_URL}/products/_doc/`
+				: "https://elasticsearch:9200/products/_doc/";
+			const productUrl = productsUrl + plid;
 
 			fetch(productUrl, {
 				method: "GET",
@@ -122,20 +122,35 @@ import base64 from "base-64";
 					return resp.json();
 				})
 				.then((res) => {
-					const method = res.found ? "PUT" : "POST";
-					return fetch(productUrl, {
-						method,
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Basic ${base64.encode(
-								`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
-							)}`,
-						},
-						tls: {
-							rejectUnauthorized: false,
-						},
-						body: JSON.stringify(scrapedProduct),
-					});
+					if (!res.found) {
+						return fetch(productUrl, {
+							method: "PUT",
+							headers: {
+								"Content-Type": "application/json",
+								Authorization: `Basic ${base64.encode(
+									`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
+								)}`,
+							},
+							tls: {
+								rejectUnauthorized: false,
+							},
+							body: JSON.stringify(scrapedProduct),
+						});
+					} else {
+						return fetch(productsUrl, {
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+								Authorization: `Basic ${base64.encode(
+									`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
+								)}`,
+							},
+							tls: {
+								rejectUnauthorized: false,
+							},
+							body: JSON.stringify(scrapedProduct),
+						});
+					}
 				})
 				.then((resp) => {
 					if (!resp.ok) {
