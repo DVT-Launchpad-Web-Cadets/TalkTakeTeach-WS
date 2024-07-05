@@ -124,7 +124,7 @@ const logger = winston.createLogger({
         },
       })
         .then((resp) => {
-          logger.info(resp.headers);
+          logger.info({ request: resp, headers: resp.headers });
           if (!resp.ok && resp.status !== 404) {
             logger.error(resp);
             throw new Error(`HTTP error! status: ${resp.status}`);
@@ -148,14 +148,14 @@ const logger = winston.createLogger({
           });
         })
         .then((resp) => {
-          logger.info(resp.headers);
+          logger.info({ request: resp, headers: resp.headers });
           if (!resp.ok) {
             logger.error(resp);
             throw new Error(`HTTP error! status: ${resp.status}`);
           }
           return resp.json();
         })
-        .then((res) => logger.info(res.headers))
+        .then((res) => logger.info(res))
         .catch((err) => logger.error(err));
     }
   } catch (error) {
