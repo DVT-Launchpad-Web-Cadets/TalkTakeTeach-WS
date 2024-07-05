@@ -49,4 +49,6 @@ RUN crontab /etc/cron.d/cronjob
 RUN touch /var/log/cron.log
 RUN touch /var/log/cron.error.log
 
+RUN printenv > /etc/environment
+
 CMD ["cron", "-f"]
