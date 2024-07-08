@@ -1,0 +1,15 @@
+# Cron cheatsheet - https://devhints.io/cron
+# Min  Hour Day  Mon  Weekday
+# *    *    *    *    *  command to be executed
+# ┬    ┬    ┬    ┬    ┬
+# │    │    │    │    └─  Weekday  (0=Sun .. 6=Sat)
+# │    │    │    └──────  Month    (1..12)
+# │    │    └───────────  Day      (1..31)
+# │    └────────────────  Hour     (0..23)
+# └─────────────────────  Minute   (0..59)
+
+# Run the web scraper script every 10th minute
+*/10 * * * * /app/run-scraper.sh >> /var/log/cron.log 2>> /var/log/cron.error.log
+
+# Run the delete old records script every 12th hour
+0 */12 * * * /app/run-scraper.sh >> /var/log/cron.log 2>> /var/log/cron.error.log
