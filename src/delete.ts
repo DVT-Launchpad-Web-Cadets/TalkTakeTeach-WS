@@ -103,7 +103,7 @@ async function deleteProduct(id: string) {
       logger.info(resp.headers);
       resp.json();
     })
-    .then((res) => console.log(res))
+    .then((res) => logger.info(res))
     .catch((err) => {
       logger.error(err.message);
     });
