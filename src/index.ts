@@ -122,35 +122,20 @@ import { ProductInterface } from "./models/models";
 					return resp.json();
 				})
 				.then((res) => {
-					if (!res.found) {
-						return fetch(productUrl, {
-							method: "PUT",
-							headers: {
-								"Content-Type": "application/json",
-								Authorization: `Basic ${base64.encode(
-									`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
-								)}`,
-							},
-							tls: {
-								rejectUnauthorized: false,
-							},
-							body: JSON.stringify(scrapedProduct),
-						});
-					} else {
-						return fetch(productsUrl, {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-								Authorization: `Basic ${base64.encode(
-									`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
-								)}`,
-							},
-							tls: {
-								rejectUnauthorized: false,
-							},
-							body: JSON.stringify(scrapedProduct),
-						});
-					}
+					const method = res.found ? "PUT" : "POST";
+					return fetch(productUrl, {
+						method,
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Basic ${base64.encode(
+								`${process.env.ELASTIC_USERNAME}:${process.env.ELASTIC_PASSWORD}`
+							)}`,
+						},
+						tls: {
+							rejectUnauthorized: false,
+						},
+						body: JSON.stringify(scrapedProduct),
+					});
 				})
 				.then((resp) => {
 					if (!resp.ok) {
