@@ -49,6 +49,7 @@ import { ProductInterface } from "./models/models";
 				(await product.locator("> a").getAttribute("href"));
 			const price = parseInt(
 				(await product.locator("div.card-section ul li").last().innerText())
+					.replace(",", "")
 					.split(" ")
 					.reverse()[0]
 			);
@@ -63,6 +64,7 @@ import { ProductInterface } from "./models/models";
 			if ((await product.locator("div.card-section ul li").count()) > 1) {
 				productObject.salePrice = parseInt(
 					(await product.locator("div.card-section ul li").first().innerText())
+						.replace(",", "")
 						.split(" ")
 						.reverse()[0]
 				);
