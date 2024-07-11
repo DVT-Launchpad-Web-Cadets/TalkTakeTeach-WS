@@ -12,4 +12,4 @@
 */10 * * * * /app/run-scraper.sh >> /var/log/cron.log 2>> /var/log/cron.error.log
 
 # Run the delete old records script every 12th hour
-0 */12 * * * /app/run-scraper.sh >> /var/log/cron.log 2>> /var/log/cron.error.log
+0 */12 * * * /app/run-delete.sh >> /var/log/cron.log 2>> /var/log/cron.error.log
