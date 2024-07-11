@@ -3,8 +3,6 @@ FROM oven/bun
 WORKDIR /app
 
 ENV ELASTIC_URL "https://elasticsearch:9200"
-ENV ELASTIC_USERNAME "elastic"
-ENV ELASTIC_PASSWORD "8HGdKO=3drZRL9tWb14E"
 ENV PAGE_URL "https://www.takealot.com/all?sort=Relevance%EF%BB%BF%EF%BB%BF"
 
 COPY . .
